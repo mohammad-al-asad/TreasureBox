@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .font-serif {
+    font-family: var(--font-serif), "Faustina", Georgia, serif;
+  }
+  .font-sans {
+    font-family: var(--font-sans), "Plus Jakarta Sans", system-ui, sans-serif;
+  }
+}
+
+:root {
+  --bg-dark: #0D2823;
+  --bg-cream: #F6F5EF;
+  --accent-gold: #E1BF62;
+  --accent-gold-hover: #D4AF37;
+}
+
+/* Custom scrollbar for modern dashboards */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(13, 40, 35, 0.2);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(13, 40, 35, 0.4);
+}
+
+/* SVG Pattern Background for Sidebar & Login */
+.bg-circles-pattern {
+  background-image: radial-gradient(circle at 10% 20%, rgba(225, 191, 98, 0.12) 0%, transparent 60%),
+                    radial-gradient(circle at 90% 80%, rgba(225, 191, 98, 0.08) 0%, transparent 50%);
+}

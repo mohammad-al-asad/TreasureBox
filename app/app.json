@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "Treasure Box",
+    "slug": "treasure-box",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0D2823"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.treasurebox.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0D2823",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f12a80ab-8509-4418-a0b8-92c213739637"
+      }
+    },
+    "owner": "ahteshamull"
+  }
+}
