@@ -372,12 +372,13 @@ export const CipherWheel: React.FC<CipherWheelProps> = ({
   const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
-    // Whenever columns change, sequence changes, or window resizes, snap to offset 0 so Dial 1 and left cap are never cut off
+    // Whenever columns change or window resizes, snap to offset 0 so Dial 1 and left cap are never cut off.
+    // Not keyed on initialSequence: parents feed onSequenceChange back into it, so every dial turn would reset the scroll.
     const timer = setTimeout(() => {
       scrollRef.current?.scrollTo({ x: 0, animated: false });
     }, 40);
     return () => clearTimeout(timer);
-  }, [columns, initialSequence, width]);
+  }, [columns, width]);
 
   const registerHandle = (
     index: number,

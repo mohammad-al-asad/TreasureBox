@@ -288,7 +288,7 @@ function MainNavigator() {
         await hunterApi.submitTreasureClaim({
           huntId: selectedHunt.id,
           hunterName: name,
-          hunterEmail: currentUser?.email || "",
+          hunterEmail: currentUser?.email || undefined,
           proofPhotoUrl: photoUri,
         });
       } catch (e) {

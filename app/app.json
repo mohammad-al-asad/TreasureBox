@@ -31,6 +31,24 @@
         "projectId": "f12a80ab-8509-4418-a0b8-92c213739637"
       }
     },
-    "owner": "ahteshamull"
+    "owner": "ahteshamull",
+    "plugins": [
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false,
+          "enableBackgroundPlayback": false
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to use your camera to photograph the treasure you found.",
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos to attach a picture of the treasure you found.",
+          "microphonePermission": false
+        }
+      ]
+    ]
   }
 }

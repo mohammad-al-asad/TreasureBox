@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   Image,
   StyleSheet,
   Alert,
+  Keyboard,
+  Platform,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Feather, Ionicons } from "@expo/vector-icons";
@@ -30,27 +32,101 @@ export const ConfirmFindScreen: React.FC<ConfirmFindScreenProps> = ({
 }) => {
   const { t, isRTL } = useLanguage();
   const [photoUri, setPhotoUri] = useState<string | null>(null);
+  // Width / height of the chosen photo so the preview shows it uncropped (portrait by default)
+  const [photoAspect, setPhotoAspect] = useState(3 / 4);
   const [hunterName, setHunterName] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const scrollRef = useRef<ScrollView>(null);
 
-  const handlePickImage = async () => {
+  // Keep the name field visible above the keyboard while typing
+  useEffect(() => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    const showSub = Keyboard.addListener(showEvent, (e) => {
+      setKeyboardHeight(e.endCoordinates.height);
+      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 50);
+    });
+    const hideSub = Keyboard.addListener(hideEvent, () => setKeyboardHeight(0));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  const handlePickerResult = (result: ImagePicker.ImagePickerResult) => {
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const asset = result.assets[0];
+      setPhotoUri(asset.uri);
+      if (asset.width && asset.height) {
+        setPhotoAspect(asset.width / asset.height);
+      }
+    }
+  };
+
+  const handleTakePhoto = async () => {
     try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
-        allowsEditing: true,
-        aspect: [4, 3],
+      const permission = await ImagePicker.requestCameraPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert(
+          isRTL ? "الكاميرا غير مسموح بها" : "Camera Access Needed",
+          isRTL
+            ? "يرجى السماح بالوصول إلى الكاميرا من إعدادات الجهاز لتصوير الكنز."
+            : "Please allow camera access in your device settings to photograph the treasure."
+        );
+        return;
+      }
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ["images"],
+        allowsEditing: false,
         quality: 0.8,
       });
+      handlePickerResult(result);
+    } catch (err) {
+      console.warn("Failed to take photo:", err);
+    }
+  };
 
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        setPhotoUri(result.assets[0].uri);
-      }
+  const handleChooseFromLibrary = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: false,
+        quality: 0.8,
+      });
+      handlePickerResult(result);
     } catch (err) {
       console.warn("Failed to pick image:", err);
     }
   };
 
+  const handlePickImage = () => {
+    Alert.alert(
+      isRTL ? "صورة الكنز" : "Treasure Photo",
+      undefined,
+      [
+        { text: isRTL ? "التقاط صورة" : "Take Photo", onPress: handleTakePhoto },
+        {
+          text: isRTL ? "اختيار من المعرض" : "Choose from Library",
+          onPress: handleChooseFromLibrary,
+        },
+        { text: isRTL ? "إلغاء" : "Cancel", style: "cancel" },
+      ],
+      { cancelable: true }
+    );
+  };
+
   const handleConfirmPress = () => {
+    // The API rejects claims without a proof photo, so require one before confirming
+    if (!photoUri) {
+      Alert.alert(
+        isRTL ? "صورة الكنز مطلوبة" : "Treasure Photo Required",
+        isRTL
+          ? "يرجى التقاط صورة للكنز أو اختيارها من المعرض قبل التأكيد."
+          : "Please take or choose a photo of the treasure before confirming."
+      );
+      return;
+    }
     if (!hunterName.trim()) {
       Alert.alert(
         isRTL ? "يرجى كتابة اسمك" : "Hunter Name Required",
@@ -73,8 +149,10 @@ export const ConfirmFindScreen: React.FC<ConfirmFindScreenProps> = ({
       <Header showBack onBack={onBack} onPressProfile={onPressProfile} />
 
       <ScrollView
-        contentContainerStyle={styles.content}
+        ref={scrollRef}
+        contentContainerStyle={[styles.content, { paddingBottom: 24 + keyboardHeight }]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         {/* Title Section */}
         <View style={[styles.headerSection, isRTL && styles.alignRight]}>
@@ -93,14 +171,17 @@ export const ConfirmFindScreen: React.FC<ConfirmFindScreenProps> = ({
         <TouchableOpacity
           onPress={handlePickImage}
           activeOpacity={0.88}
-          style={styles.viewfinderContainer}
+          style={[
+            styles.viewfinderContainer,
+            photoUri && { height: undefined, aspectRatio: photoAspect },
+          ]}
         >
           {photoUri ? (
             <View style={styles.photoWrapper}>
               <Image
                 source={{ uri: photoUri }}
                 style={styles.capturedPhoto}
-                resizeMode="cover"
+                resizeMode="contain"
               />
               <View style={styles.changeBadge}>
                 <Feather name="camera" size={14} color={colors.surfaceWhite} />
@@ -128,6 +209,9 @@ export const ConfirmFindScreen: React.FC<ConfirmFindScreenProps> = ({
           <TextInput
             value={hunterName}
             onChangeText={setHunterName}
+            onFocus={() =>
+              setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)
+            }
             placeholder={t("creditPlaceholder")}
             placeholderTextColor={colors.textMuted}
             style={[styles.inputField, isRTL && styles.textRight]}
@@ -163,7 +247,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.parchmentLight,
   },
   content: {
-    flex: 1,
+    flexGrow: 1,
     paddingHorizontal: 24,
     paddingTop: 12,
   },
@@ -266,6 +350,7 @@ const styles = StyleSheet.create({
   capturedPhoto: {
     width: "100%",
     height: "100%",
+    backgroundColor: "#000",
   },
   changeBadge: {
     position: "absolute",

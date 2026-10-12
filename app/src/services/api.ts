@@ -227,7 +227,7 @@ export interface VerifyCipherResponse {
 export interface SubmitClaimPayload {
   huntId: string;
   hunterName: string;
-  hunterEmail: string;
+  hunterEmail?: string;
   proofPhotoUrl?: string;
   notes?: string;
 }
