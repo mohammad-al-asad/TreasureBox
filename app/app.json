@@ -21,17 +21,14 @@
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "extra": {
-      "eas": {
-        "projectId": "f12a80ab-8509-4418-a0b8-92c213739637"
-      }
-    },
-    "owner": "ahteshamull",
     "plugins": [
       [
         "expo-audio",
@@ -49,6 +46,11 @@
           "microphonePermission": false
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "b7f544bd-104c-4357-9c5e-c5f4f719726f"
+      }
+    }
   }
 }
