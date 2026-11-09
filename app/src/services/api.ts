@@ -12,11 +12,11 @@ const getResolvedBaseUrl = () => {
       Platform.OS !== "web" &&
       (envUrl.includes("localhost") || envUrl.includes("127.0.0.1"))
     ) {
-      return "https://treasurebox-backend.onrender.com/api/v1";
+      return "https://api.treassurebox.com/api/v1";
     }
     return envUrl;
   }
-  return "https://treasurebox-backend.onrender.com/api/v1";
+  return "https://api.treassurebox.com/api/v1";
 };
 
 const API_BASE_URL = getResolvedBaseUrl();

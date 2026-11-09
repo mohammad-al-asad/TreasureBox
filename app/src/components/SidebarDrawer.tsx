@@ -14,6 +14,7 @@ import {
   Linking,
 } from "react-native";
 import { Ionicons, Feather } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "../theme/colors";
 import { fonts } from "../theme/fonts";
 import { useLanguage } from "../i18n/LanguageContext";
@@ -41,6 +42,7 @@ export const SidebarDrawer: React.FC<SidebarDrawerProps> = ({
   onSignIn,
 }) => {
   const { language, toggleLanguage, isRTL, t } = useLanguage();
+  const insets = useSafeAreaInsets();
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [contactSettings, setContactSettings] = useState<any>(null);
 
@@ -123,7 +125,11 @@ export const SidebarDrawer: React.FC<SidebarDrawerProps> = ({
         ]}
       >
         <ScrollView
-          contentContainerStyle={styles.drawerScroll}
+          contentContainerStyle={[
+            styles.drawerScroll,
+            // The drawer covers the full screen: keep its content clear of the status and nav bars
+            { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 40 },
+          ]}
           showsVerticalScrollIndicator={false}
           bounces={true}
         >

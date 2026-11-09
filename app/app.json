@@ -6,16 +6,21 @@
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0D2823"
-    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.treassurebox",
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "infoPlist": {
+        "CFBundleAllowMixedLocalizations": true
+      }
+    },
+    "locales": {
+      "ar": "./locales/ar.json"
     },
     "android": {
-      "package": "com.treasurebox.app",
+      "package": "com.treassurebox",
       "adaptiveIcon": {
         "backgroundColor": "#0D2823",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -44,6 +49,16 @@
           "cameraPermission": "Allow $(PRODUCT_NAME) to use your camera to photograph the treasure you found.",
           "photosPermission": "Allow $(PRODUCT_NAME) to access your photos to attach a picture of the treasure you found.",
           "microphonePermission": false
+        }
+      ],
+      "expo-asset",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#0D2823"
         }
       ]
     ],

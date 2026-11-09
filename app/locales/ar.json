@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSCameraUsageDescription": "يحتاج تطبيق Treasure Box إلى الكاميرا لتصوير الكنز الذي وجدته.",
+    "NSPhotoLibraryUsageDescription": "يحتاج تطبيق Treasure Box إلى الوصول إلى صورك لإرفاق صورة الكنز الذي وجدته."
+  }
+}
