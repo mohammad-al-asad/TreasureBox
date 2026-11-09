@@ -43,12 +43,15 @@ const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
 
 function buildStage1StaticMapUrl(lat: number, lng: number, mapWidth: number): string {
   const zoom = 15;
-  const size = `${Math.min(mapWidth, 420) * 2}x${260 * 2}`;
+  // Google rejects fractional sizes (screen widths are often fractional dp) and caps each
+  // side at 640, so round, clamp, and ask for a 2x image instead of doubling the size.
+  const w = Math.max(100, Math.min(Math.round(mapWidth), 640));
+  const size = `${w}x260`;
   if (GOOGLE_MAPS_API_KEY && GOOGLE_MAPS_API_KEY !== "YOUR_GOOGLE_MAPS_API_KEY_HERE") {
     const marker = `color:0xC59B27|label:S|${lat},${lng}`;
     return (
       `https://maps.googleapis.com/maps/api/staticmap` +
-      `?center=${lat},${lng}&zoom=${zoom}&size=${size}&maptype=roadmap` +
+      `?center=${lat},${lng}&zoom=${zoom}&size=${size}&scale=2&maptype=roadmap` +
       `&markers=${encodeURIComponent(marker)}&key=${GOOGLE_MAPS_API_KEY}`
     );
   }
