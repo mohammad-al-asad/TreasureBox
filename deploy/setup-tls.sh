@@ -5,7 +5,7 @@
 # restarts nginx so it picks up the HTTPS config.
 set -euo pipefail
 
-DOMAINS=(api.treassurebox.com admin.treassurebox.com)
+DOMAINS=(treassurebox.com www.treassurebox.com api.treassurebox.com admin.treassurebox.com)
 CERTBOT_IMAGE=certbot/certbot:v2.11.0
 NGINX_CONTAINER=treasurebox-nginx-1
 
@@ -19,7 +19,7 @@ docker run --rm \
   -v /var/www/certbot:/var/www/certbot \
   "$CERTBOT_IMAGE" certonly --webroot -w /var/www/certbot \
   --cert-name treassurebox "${ARGS[@]}" \
-  --agree-tos --register-unsafely-without-email --non-interactive --keep-until-expiring
+  --agree-tos --register-unsafely-without-email --non-interactive --keep-until-expiring --expand
 
 # Renew twice a day (certbot only renews when < 30 days remain), then reload nginx
 cat > /etc/systemd/system/certbot-renew.service <<UNIT

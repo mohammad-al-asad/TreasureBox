@@ -42,6 +42,8 @@ services:
       - ./nginx/snippets:/etc/nginx/snippets:ro
       - ./nginx/tls.conf:/etc/nginx/tls/tls.conf:ro
       - ./nginx/40-enable-tls.sh:/docker-entrypoint.d/40-enable-tls.sh:ro
+      # Landing page + privacy policy (treassurebox.com)
+      - ./site:/usr/share/nginx/site:ro
       # Let's Encrypt certificates and HTTP-01 challenge files (deploy/setup-tls.sh)
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /var/www/certbot:/var/www/certbot:ro
