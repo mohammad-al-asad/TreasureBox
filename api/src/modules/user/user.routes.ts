@@ -6,31 +6,32 @@ import {
   userIdParamsSchema,
   resetUserAccessBodySchema,
 } from './user.validation';
+import { authenticate, authorizeAdmin } from '../../middlewares/auth.middleware';
 
 const router = Router();
 
 // Action-Oriented Hunter Management Routes
 router.get(
   '/get-all-users',
-  validateRequest({ query: getAllUsersQuerySchema }),
+  authenticate, authorizeAdmin, validateRequest({ query: getAllUsersQuerySchema }),
   userController.getAllUsers
 );
 
 router.patch(
   '/toggle-user-status/:id',
-  validateRequest({ params: userIdParamsSchema }),
+  authenticate, authorizeAdmin, validateRequest({ params: userIdParamsSchema }),
   userController.toggleUserStatus
 );
 
 router.post(
   '/reset-user-access',
-  validateRequest({ body: resetUserAccessBodySchema }),
+  authenticate, authorizeAdmin, validateRequest({ body: resetUserAccessBodySchema }),
   userController.resetUserAccess
 );
 
 router.delete(
   '/revoke-user-record/:id',
-  validateRequest({ params: userIdParamsSchema }),
+  authenticate, authorizeAdmin, validateRequest({ params: userIdParamsSchema }),
   userController.revokeUserRecord
 );
 

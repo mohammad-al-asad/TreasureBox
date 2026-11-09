@@ -5,6 +5,7 @@ import {
   updateLegalDocBodySchema,
   getLegalDocParamsSchema,
 } from './settings.validation';
+import { authenticate, authorizeAdmin } from '../../middlewares/auth.middleware';
 
 const router = Router();
 
@@ -17,13 +18,13 @@ router.get(
 
 router.put(
   '/update-legal-document',
-  validateRequest({ body: updateLegalDocBodySchema }),
+  authenticate, authorizeAdmin, validateRequest({ body: updateLegalDocBodySchema }),
   settingsController.updateLegalDocument
 );
 
 // Action-Oriented Contact & Social Channel Endpoints
 router.get('/get-contact-settings', settingsController.getContactSettings);
-router.post('/update-contact-settings', settingsController.updateContactSettings);
-router.put('/update-contact-settings', settingsController.updateContactSettings);
+router.post('/update-contact-settings', authenticate, authorizeAdmin, settingsController.updateContactSettings);
+router.put('/update-contact-settings', authenticate, authorizeAdmin, settingsController.updateContactSettings);
 
 export default router;

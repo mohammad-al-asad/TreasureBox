@@ -5,7 +5,9 @@ import { asyncHandler } from '../../utils/asyncHandler';
 
 export class ClaimController {
   public submitClaim = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const result = await claimService.submitClaim(req.body);
+    // Login is required: record the claim against the signed-in account's email
+    const email = (req as Request & { account?: { email?: string } }).account?.email;
+    const result = await claimService.submitClaim({ ...req.body, hunterEmail: email || req.body.hunterEmail });
     res.status(201).json(sendSuccess('Treasure claim submitted successfully for verification', result));
   });
 

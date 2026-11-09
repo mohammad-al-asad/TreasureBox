@@ -8,11 +8,12 @@ import {
   verifyCipherSolutionSchema,
   getHuntByIdSchema,
 } from './hunt.validation';
+import { authenticate, authorizeAdmin } from '../../middlewares/auth.middleware';
 
 const router = Router();
 
 // Media Upload Endpoint (Stores to /uploads/images/ and returns relative path)
-router.post('/upload-media-file', uploadHuntMedia.single('file'), huntController.uploadMediaFile);
+router.post('/upload-media-file', authenticate, uploadHuntMedia.single('file'), huntController.uploadMediaFile);
 
 // Action-Oriented Hunter Endpoints (Mobile App)
 router.get('/get-all-live-hunts', huntController.getAllLiveHunts);
@@ -29,25 +30,25 @@ router.post(
 );
 
 // Action-Oriented Dashboard / Operator Endpoints
-router.get('/get-all-cabinet-hunts', huntController.getAllCabinetHunts);
+router.get('/get-all-cabinet-hunts', authenticate, authorizeAdmin, huntController.getAllCabinetHunts);
 router.get(
   '/get-cabinet-hunt-by-id/:id',
-  validateRequest({ params: getHuntByIdSchema }),
+  authenticate, authorizeAdmin, validateRequest({ params: getHuntByIdSchema }),
   huntController.getCabinetHuntById
 );
 router.post(
   '/create-new-hunt',
-  validateRequest({ body: createHuntSchema }),
+  authenticate, authorizeAdmin, validateRequest({ body: createHuntSchema }),
   huntController.createHunt
 );
 router.put(
   '/update-hunt-details/:id',
-  validateRequest({ params: getHuntByIdSchema, body: updateHuntSchema }),
+  authenticate, authorizeAdmin, validateRequest({ params: getHuntByIdSchema, body: updateHuntSchema }),
   huntController.updateHuntDetails
 );
 router.delete(
   '/delete-hunt/:id',
-  validateRequest({ params: getHuntByIdSchema }),
+  authenticate, authorizeAdmin, validateRequest({ params: getHuntByIdSchema }),
   huntController.deleteHunt
 );
 

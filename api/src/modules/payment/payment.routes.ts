@@ -6,28 +6,29 @@ import {
   capturePayPalOrderBodySchema,
   purchaseHuntPermitBodySchema,
 } from './payment.validation';
+import { authenticate, authorizeAdmin } from '../../middlewares/auth.middleware';
 
 const router = Router();
 
 // Action-Oriented PayPal Payment Endpoints
 router.post(
   '/create-paypal-order',
-  validateRequest({ body: createPayPalOrderBodySchema }),
+  authenticate, validateRequest({ body: createPayPalOrderBodySchema }),
   paymentController.createPayPalOrder
 );
 
 router.post(
   '/capture-paypal-order',
-  validateRequest({ body: capturePayPalOrderBodySchema }),
+  authenticate, validateRequest({ body: capturePayPalOrderBodySchema }),
   paymentController.capturePayPalOrder
 );
 
 router.post(
   '/purchase-hunt-permit',
-  validateRequest({ body: purchaseHuntPermitBodySchema }),
+  authenticate, validateRequest({ body: purchaseHuntPermitBodySchema }),
   paymentController.purchaseHuntPermit
 );
 
-router.get('/get-all-payment-transactions', paymentController.getAllTransactions);
+router.get('/get-all-payment-transactions', authenticate, authorizeAdmin, paymentController.getAllTransactions);
 
 export default router;
