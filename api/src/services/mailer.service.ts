@@ -23,7 +23,9 @@ class MailerService {
       const user = process.env.SMTP_USER;
       const pass = process.env.SMTP_PASS;
 
-      if (user && pass && user !== 'dummy_user') {
+      if (env.RESEND_API_KEY) {
+        logger.info('Email delivery via Resend API');
+      } else if (user && pass && user !== 'dummy_user') {
         this.transporter = nodemailer.createTransport({
           host,
           port,
@@ -48,6 +50,10 @@ class MailerService {
         .replace(/<[^>]+>/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
+
+    if (env.RESEND_API_KEY) {
+      return this.sendWithResend(options, plainText);
+    }
 
     if (this.transporter) {
       try {
@@ -75,6 +81,33 @@ class MailerService {
 
     // Dev Fallback Logging
     logger.info(`[DEV EMAIL SENDER] To: ${options.to} | Subject: "${options.subject}"`);
+    return true;
+  }
+
+  /** Sends through the Resend HTTP API (https://resend.com/docs/api-reference/emails/send-email). */
+  private async sendWithResend(options: SendMailOptions, plainText: string): Promise<boolean> {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: env.RESEND_FROM,
+        to: [options.to],
+        subject: options.subject,
+        html: options.html,
+        text: plainText,
+      }),
+    });
+
+    if (!response.ok) {
+      const body = await response.text().catch(() => '');
+      logger.error(`Resend rejected email to ${options.to}: ${response.status} ${body}`);
+      throw new Error(`Failed to send email via Resend (${response.status})`);
+    }
+
+    logger.info(`Email successfully dispatched to ${options.to} via Resend`);
     return true;
   }
 }

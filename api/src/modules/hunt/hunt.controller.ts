@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { huntService } from './hunt.service';
 import { sendSuccess, AppError } from '../../utils/response';
 import { asyncHandler } from '../../utils/asyncHandler';
+import { persistUpload } from '../../services/storage.service';
 
 const paginationQuerySchema = z.object({
   page: z
@@ -22,6 +23,7 @@ export class HuntController {
     if (!req.file) {
       throw new AppError(400, 'No file was provided for upload', 'FILE_REQUIRED');
     }
+    await persistUpload(req.file, 'images');
     const relativePath = `uploads/images/${req.file.filename}`;
     const fullUrl = `${req.protocol}://${req.get('host')}/${relativePath}`;
 

@@ -7,8 +7,12 @@ import routes from './routes';
 import { errorMiddleware } from './middlewares/error.middleware';
 import { AppError, sendSuccess } from './utils/response';
 import { apiRateLimiter } from './middlewares/rate-limit.middleware';
+import { getSignedUploadUrl, isS3Enabled } from './services/storage.service';
 
 const app = express();
+
+// Behind nginx: trust X-Forwarded-* so req.protocol, req.ip and rate limiting see the real client
+app.set('trust proxy', 1);
 
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(cors());
@@ -18,6 +22,18 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Static uploads serving for avatars and assets
 const uploadsPath = path.join(process.cwd(), 'uploads');
 app.use('/uploads', express.static(uploadsPath));
+// Files stored in S3: redirect to a short-lived signed URL
+app.get('/uploads/*', async (req, res, next) => {
+  if (!isS3Enabled()) return next();
+  try {
+    const signedUrl = await getSignedUploadUrl(decodeURIComponent(req.path.replace(/^\/uploads\//, '')));
+    if (!signedUrl) return next();
+    res.set('Cache-Control', 'private, max-age=300');
+    return res.redirect(302, signedUrl);
+  } catch (error) {
+    return next(error);
+  }
+});
 app.use('/uploads', (req, res) => {
   const defaultFallbackImage = path.join(uploadsPath, 'images', 'default-hunt.jpg');
   if (fs.existsSync(defaultFallbackImage)) {

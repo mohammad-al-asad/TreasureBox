@@ -3,6 +3,7 @@ import { asyncHandler } from '../../utils/asyncHandler';
 import { sendSuccess, AppError } from '../../utils/response';
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
 import { AccountRole } from './auth.types';
+import { persistUpload } from '../../services/storage.service';
 import {
   getAccountProfile,
   loginAccount,
@@ -98,6 +99,7 @@ export const changePasswordController = asyncHandler(async (req: AuthenticatedRe
 export const updateMyProfileController = asyncHandler(async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const payload: { name: string; avatar?: string } = { ...req.body };
   if (req.file) {
+    await persistUpload(req.file, 'avatars');
     const host = req.get('host') || 'localhost:5000';
     const protocol = req.protocol || 'http';
     payload.avatar = `${protocol}://${host}/uploads/avatars/${req.file.filename}`;
@@ -111,6 +113,7 @@ export const uploadProfileImageController = asyncHandler(async (req: Authenticat
     throw new AppError(400, 'No image file uploaded. Please provide an avatar image file.', 'MISSING_FILE');
   }
 
+  await persistUpload(req.file, 'avatars');
   const host = req.get('host') || 'localhost:5000';
   const protocol = req.protocol || 'http';
   const avatarUrl = `${protocol}://${host}/uploads/avatars/${req.file.filename}`;

@@ -33,6 +33,10 @@ const envSchema = z.object({
   PAYPAL_CLIENT_ID: z.string().optional(),
   PAYPAL_CLIENT_SECRET: z.string().optional(),
   PAYPAL_MODE: z.enum(['sandbox', 'live']).default('sandbox'),
+  RESEND_API_KEY: z.string().optional(),
+  RESEND_FROM: z.string().default('TreasureBox <onboarding@resend.dev>'),
+  S3_BUCKET: z.string().optional(),
+  AWS_REGION: z.string().default('eu-north-1'),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
