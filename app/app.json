@@ -49,8 +49,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "b7f544bd-104c-4357-9c5e-c5f4f719726f"
+        "projectId": "fd45d9ec-451a-4ea2-8f69-bba750981cb6"
       }
-    }
+    },
+    "owner": "treasure-box-app"
   }
 }
